@@ -24,15 +24,14 @@
 #include <SPI.h>
 #include <TelegramBot.h> 
 #include <Adafruit_SleepyDog.h>
-#define        COV_RATIO                       0.2            //ug/mmm / mv
-#define        NO_DUST_VOLTAGE                 450            //mv
-#define        SYS_VOLTAGE                     5000           
+#define ANALOG_VOLTAGE 3.3 // analog top of range         
 
-const int iled = 4;                                            //drive the led of sensor
-const int vout = 0;                                            //analog input
+const int ledPin = 5;                                            //drive the led of sensor
+const int dustPin = A0;                                            //analog input
 
+unsigned long time_now;
 float density, voltage;
-int   adcvalue, count, trigger;
+bool trigger;
 
 // Initialize Wifi connection to the router
 char ssid[] = SECRET_SSID;             // your network SSID (name)
@@ -77,16 +76,13 @@ int Filter(int m)
   }
 }
 
-
 void setup() {
 
-  pinMode(iled, OUTPUT);
-  digitalWrite(iled, LOW);                                     //iled default closed
-  pinMode(vout,INPUT);
+  time_now = 0;
   Serial.begin(115200);
   while (!Serial) {} // Wait for the Serial monitor to be opened
-  delay(3000);
-
+  delay(100);
+  pinMode(ledPin, OUTPUT);
   // attempt to connect to Wifi network:
   Serial.print("Connecting Wifi: ");
   Serial.println(ssid);
@@ -97,36 +93,45 @@ void setup() {
   Serial.println("");
   Serial.println("WiFi connected");
 
-  //bot.begin();
+  bot.begin();
   //Watchdog.enable(10000); // Timer set to 10 sec;
-  count = 0;
 }
-  
-void loop() {
 
-  //analogWrite(iled,230);
-  Serial.println("On");
-  adcvalue = analogRead(vout);
-  Serial.println("Off");
-  voltage = (SYS_VOLTAGE / 4096.0) * adcvalue * 11;
-  if(voltage >= NO_DUST_VOLTAGE)
+void loop() {
+  digitalWrite(ledPin,LOW);
+  delayMicroseconds(280);
+  voltage = analogRead(dustPin);
+  delay(1);
+  digitalWrite(ledPin,HIGH);
+  voltage = Filter(voltage);
+/*if(micros()-time_now > period1)
   {
-    voltage -= NO_DUST_VOLTAGE;
-    
-    density = voltage * COV_RATIO;
-  }
-  else
-    density = 0;
-  /*Watchdog.reset(); //if function is not called in 10 sec, the board will reset itself
-  message m = bot.getUpdates(); // Read new messages
-  if (count == 200 && density > 120 && trigger == 0){
+  digitalWrite(iled,HIGH);
+  Serial.println("On");
+  if ((micros()%period1)-time_now > period2)
+     { 
+      adcvalue = analogRead(vout);
+      digitalWrite(iled,LOW);
+      Serial.println("Off");
+      time_now = micros();*/
+  voltage = (voltage / 1023.0) * ANALOG_VOLTAGE;
+  density = 1000*0.18*voltage;
+  Serial.print("Voltage = ");
+  Serial.print(voltage);
+  Serial.print(",\tDust Density = ");
+  Serial.print(density);
+  Serial.println(" ug/m3");
+  delay(1000);
+//Watchdog.reset(); //if function is not called in 10 sec, the board will reset itself
+if (density > 55 && !trigger)
+  {
     bot.sendMessage(MessageID, "It's dusty! Turn on the filter.");
-    count = 0;
     trigger = 1;
   }
-  count ++;
-  if (count == (200*60)){
-    count = 0;
+if (millis()-time_now == 120000)
+  {
     trigger = 0;
-  }*/
+    time_now = millis();
+  }
+  delay(1000);
 }
