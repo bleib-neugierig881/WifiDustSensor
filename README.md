@@ -30,8 +30,8 @@ The Waveshare code provides a rudimentary form of this sampling using a simple d
 
 The useful parts of the Waveshare code I preserved were the average function to even out the signal readings; the original "NO DUST VOLTAGE" levels, as I assume this was a calibration done by Waveshare with better equipment than what I have available; and the conversion from the AOUT voltage reading into the dust density. Waveshare also kindly provided a table at the end of their module's "User Manual" to show the correlation of density reading and rated air quality, as shown below:
 
-Density:      |    Air Quality:           |     AQI:
-0   - 35            Excellent                   0   - 50
+Density:\t      |    Air Quality:\t           |\t     AQI:\n
+0   - 35\t            Excellent\t                   0   - 50\n
 35  - 75            Average                     51  - 100
 75  - 115           Light Pollution             101 - 150
 115 - 150           Moderate Pollution          151 - 200
