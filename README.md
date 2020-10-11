@@ -17,6 +17,9 @@ data sheet for the dust sensor, a Sharp GP2Y1014AU0F (https://www.mouser.com/dat
 
 This code and readme will be updated as frequently as possible, until a working solution is found.
 
+10/11/2020:
+I finally got the sensor readings coming out normal on the 3.3V Arduino MKR 1000 and am now working on building a case for the project. The sensor is more accurately described as a smoke sensor rather than dust, as the dust concentration has to be rather significant in order to get a noticeable rise in the output. Thankfully, I may not need this sensor to be deployed for home use until next fire season, but I'm glad to have gained expereince in troubleshooting and persisting and will post photos of the finished project soon.
+
 ***********************************
 Setup:
 
@@ -28,10 +31,10 @@ The ILED pulses a light signal and it's diffraction due to dust particles is pic
 
 The Waveshare code provides a rudimentary form of this sampling using a simple delayMicroseconds() function to create a 280 microsecond delay after the ILED pin is turned HIGH.  The AOUT input is then recorded and the ILED pin is set back to LOW.
 
-The useful parts of the Waveshare code I preserved were the average function to even out the signal readings; the original "NO DUST VOLTAGE" levels, as I assume this was a calibration done by Waveshare with better equipment than what I have available; and the conversion from the AOUT voltage reading into the dust density. Waveshare also kindly provided a table at the end of their module's "User Manual" to show the correlation of density reading and rated air quality, as shown below:
+The useful part of the Waveshare code I preserved was the average function to even out the signal readings. Waveshare also kindly provided a table at the end of their module's "User Manual" to show the correlation of density reading and rated air quality, as shown below:
 
-Density:\t      |    Air Quality:\t           |\t     AQI:\n
-0   - 35\t            Excellent\t                   0   - 50\n
+Density:      |    Air Quality:           |     AQI:
+0   - 35            Excellent                   0   - 50
 35  - 75            Average                     51  - 100
 75  - 115           Light Pollution             101 - 150
 115 - 150           Moderate Pollution          151 - 200
